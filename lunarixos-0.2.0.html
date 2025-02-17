@@ -1,0 +1,593 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>LunarixOS</title>
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            background: url('https://pfst.cf2.poecdn.net/base/image/ad1e0434aa6bdc9fcba468cffc80ed994580ceada9ab9388b4e666d5edbaf6ec?w=1024&h=576&pmaid=289054046') no-repeat center center fixed;
+            background-size: cover;
+            color: white;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+        }
+
+        .dock {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            padding: 10px 20px;
+            border-radius: 16px;
+            display: flex;
+            gap: 25px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+        }
+
+        .app-icon {
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .app-icon:hover {
+            transform: scale(1.1);
+        }
+
+        .window {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            min-width: 300px;
+                z-index: 1001; 
+
+        }
+
+        .title-bar {
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 12px 12px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: move;
+        }
+
+        .close-btn {
+            width: 20px;
+            height: 20px;
+            background: #ff5f57;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .close-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .clock {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 12px 24px;
+            border-radius: 8px;
+            color: white;
+            font-family: monospace;
+            backdrop-filter: blur(4px);
+        }
+        
+    .browser-window {
+        width: 800px;
+        height: 600px;
+    }
+
+    .address-bar {
+        padding: 12px;
+        display: flex;
+        gap: 8px;
+        background: rgba(0, 0, 0, 0.2);
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .address-input {
+        flex: 1;
+        padding: 8px 12px;
+        background: rgba(0,0,0,0.3);
+        border: 1px solid rgba(255,255,255,0.1);
+        color: white;
+        border-radius: 4px;
+        font-family: Arial, sans-serif;
+    }
+
+    .go-button {
+        padding: 8px 16px;
+        background: rgba(255,255,255,0.1);
+        border: none;
+        color: white;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+    .go-button:hover {
+        background: rgba(255,255,255,0.2);
+    }
+
+    .browser-iframe {
+        width: 100%;
+        height: calc(100% - 92px);
+        border: none;
+        border-radius: 0 0 12px 12px;
+    }
+    
+    .terminal-window {
+        width: 600px;
+        height: 400px;
+    }
+
+    .terminal-content {
+        padding: 15px;
+        font-family: monospace;
+        color: #fff;
+        height: calc(100% - 70px);
+        overflow-y: auto;
+        white-space: pre-wrap;
+    }
+
+    .terminal-input-line {
+        display: flex;
+        align-items: center;
+        padding: 0 15px 15px 15px;
+    }
+
+    .terminal-prompt {
+        margin-right: 10px;
+        white-space: nowrap;
+    }
+
+    .terminal-input {
+        flex: 1;
+        background: transparent;
+        border: none;
+        color: currentColor;
+        font-family: monospace;
+        font-size: inherit;
+        outline: none;
+        caret-color: white;
+    }
+
+    .terminal-input[contenteditable]:empty::before {
+        content: " ";
+        white-space: pre;
+    }
+        
+        .settings-window {
+            width: 600px;
+            height: 400px;
+        }
+
+        .settings-sidebar {
+            width: 120px;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 20px 0;
+            border-right: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .settings-category {
+            padding: 12px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .settings-category.active {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .settings-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .settings-section {
+            margin-bottom: 25px;
+        }
+
+        .settings-label {
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .settings-input {
+            width: 100%;
+            padding: 8px;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: white;
+            border-radius: 4px;
+        }
+
+        .reset-button {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: #ff4444;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .custom-alert {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1002;
+        }
+
+        .alert-content {
+            background: rgba(0,0,0,0.7);
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .alert-button {
+            padding: 8px 20px;
+            margin: 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .yes-btn {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .no-btn {
+            background: #ff4444;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="clock" id="clock"></div>
+
+<div class="dock">
+    <!-- App Icons -->
+    <img src="https://cdn-icons-png.flaticon.com/512/888/888846.png" 
+         class="app-icon" 
+         alt="Browser" 
+         onclick="launchApp('Web Browser')">
+    <img src="https://cdn-icons-png.flaticon.com/512/3767/3767084.png" 
+         class="app-icon" 
+         alt="Files" 
+         onclick="launchApp('File Manager')">
+    <img src="https://cdn-icons-png.flaticon.com/512/4248/4248402.png" 
+         class="app-icon" 
+         alt="Terminal" 
+         onclick="launchApp('Terminal')">
+    <img src="https://cdn-icons-png.flaticon.com/512/3953/3953226.png" 
+         class="app-icon" 
+         alt="Settings" 
+         onclick="launchApp('System Settings')">
+</div>
+
+    <div class="custom-alert" id="customAlert">
+        <div class="alert-content">
+            <h3>Reset Settings?</h3>
+            <p>Are you sure you want to reset all settings to default?</p>
+            <button class="alert-button yes-btn" onclick="confirmReset(true)">Yes</button>
+            <button class="alert-button no-btn" onclick="confirmReset(false)">No</button>
+        </div>
+    </div>
+
+
+    <script>
+let isDragging = false;
+let currentWindow;
+let offset = [0,0];
+
+function startDrag(e) {
+    if (e.target.classList.contains('close-btn')) return;
+    isDragging = true;
+    currentWindow = e.target.closest('.window');
+    offset = [
+        currentWindow.offsetLeft - e.clientX,
+        currentWindow.offsetTop - e.clientY
+    ];
+    document.body.style.userSelect = 'none';
+    
+    document.addEventListener('mousemove', drag);
+    document.addEventListener('mouseup', stopDrag);
+}
+
+function drag(e) {
+    e.preventDefault();
+    if (isDragging) {
+        currentWindow.style.left = (e.clientX + offset[0]) + 'px';
+        currentWindow.style.top = (e.clientY + offset[1]) + 'px';
+    }
+}
+
+function stopDrag() {
+    isDragging = false;
+    document.body.style.userSelect = '';
+    
+    document.removeEventListener('mousemove', drag);
+    document.removeEventListener('mouseup', stopDrag);
+}
+
+function launchApp(appName) {
+    createWindow(appName);
+}
+
+function createWindow(title) {
+	if(title === 'System Settings') return createSettingsWindow();
+    if(title === 'Terminal') return createTerminalWindow();
+    if(title === 'Web Browser N/A') return createBrowserWindow();
+
+    const newWindow = document.createElement('div');
+    newWindow.className = 'window';
+    newWindow.innerHTML = `
+        <div class="title-bar">
+            <span>${title}</span>
+            <div class="close-btn" onclick="this.parentElement.parentElement.remove()"></div>
+        </div>
+        <div class="content" style="padding:20px;height:200px">Work In Progress! Check back soon!</div>
+    `;
+    
+    newWindow.style.left = `${Math.random() * window.innerWidth * 0.5}px`;
+    newWindow.style.top = `${Math.random() * window.innerHeight * 0.5}px`;
+    
+    newWindow.querySelector('.title-bar').addEventListener('mousedown', startDrag);
+    document.body.appendChild(newWindow);
+    return newWindow;
+}
+
+function createTerminalWindow() {
+    const termWindow = document.createElement('div');
+    termWindow.className = 'window terminal-window';
+    termWindow.innerHTML = `
+        <div class="title-bar">
+            <span>Terminal</span>
+            <div class="close-btn" onclick="this.parentElement.parentElement.remove()"></div>
+        </div>
+        <div class="terminal-content" id="termContent"></div>
+        <div class="terminal-input-line">
+            <span class="terminal-prompt" id="prompt">user@SimmerOS-Web-1 ~ ></span>
+            <div class="terminal-input" contenteditable="true" id="termInput"></div>
+        </div>
+    `;
+    
+    termWindow.style.left = `${window.innerWidth/2 - 300}px`;
+    termWindow.style.top = `${window.innerHeight/2 - 200}px`;
+    
+    termWindow.querySelector('.title-bar').addEventListener('mousedown', startDrag);
+    document.body.appendChild(termWindow);
+    
+    const termContent = termWindow.querySelector('#termContent');
+    const termInput = termWindow.querySelector('#termInput');
+    
+    const now = new Date();
+    const options = { 
+        weekday: 'short', 
+        month: 'short', 
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: localStorage.getItem('clockFormat') === '12'
+    };
+    const loginTime = now.toLocaleString('en-US', options).replace(',','');
+    termContent.innerHTML = `Last login: ${loginTime} on terminal\n`;
+    
+    let currentColor = '#ffffff';
+    
+    termInput.addEventListener('keydown', (e) => {
+        if(e.key === 'Enter') {
+            e.preventDefault();
+            const command = termInput.textContent.trim();
+            termContent.innerHTML += `<span style="color:${currentColor}">${termInput.textContent}</span>\n`;
+            
+            const output = processCommand(command);
+            termContent.innerHTML += `<span style="color:${currentColor}">${output}</span>\n`;
+            
+            termInput.textContent = '';
+            termContent.scrollTop = termContent.scrollHeight;
+        }
+    });
+    
+    termInput.focus();
+    
+    return termWindow;
+}
+
+function processCommand(command) {
+    const args = command.split(' ');
+    const cmd = args[0].toLowerCase();
+    
+    switch(cmd) {
+        case 'help':
+            return `Available commands:
+help      - Show this help message
+color     - Change text color (hex or name)
+clear     - Clear the terminal
+echo      - Display a message
+Example: > color #ff0000 or > color red`;
+            
+        case 'color':
+            if(args.length < 2) return 'Usage: color [hex|name]';
+            const color = args[1];
+            if(isValidColor(color)) {
+                currentColor = color;
+                return `Text color changed to ${color}`;
+            }
+            return `Invalid color: ${color}`;
+            
+        case 'clear':
+            termContent.innerHTML = '';
+            return '';
+            
+        case 'echo':
+            return args.slice(1).join(' ') || 'Usage: echo [message]';
+            
+        default:
+            return `Command not found: ${cmd}. Type 'help' for available commands`;
+    }
+}
+
+function isValidColor(color) {
+    const hexRegex = /^#([0-9A-F]{3}){1,2}$/i;
+    const namedColors = [
+        'red', 'orange', 'yellow', 'green', 'blue', 
+        'purple', 'pink', 'white', 'gray', 'black'
+    ];
+    return hexRegex.test(color) || namedColors.includes(color.toLowerCase());
+}
+
+function createSettingsWindow() {
+    const settingsWindow = document.createElement('div'); 
+    settingsWindow.className = 'window settings-window';
+    settingsWindow.innerHTML = `
+        <div class="title-bar">
+            <span>System Settings</span>
+            <div class="close-btn" onclick="this.parentElement.parentElement.remove()"></div>
+        </div>
+        <div style="display: flex; height: calc(100% - 40px);">
+            <div class="settings-sidebar">
+                <div class="settings-category active">Customize</div>
+            </div>
+            <div class="settings-content">
+<div class="settings-section">
+                    <h3>Wallpaper</h3>
+                    <input type="text" class="settings-input" id="wallpaperUrl" 
+                           placeholder="Image URL" oninput="updateWallpaper(this.value)">
+                    <input type="file" class="settings-input" id="wallpaperFile" 
+                           accept="image/*" onchange="handleFileUpload(this)" style="margin-top: 10px;">
+                </div>
+                
+                <div class="settings-section">
+                    <h3>Clock Format</h3>
+                    <label class="settings-label">
+                        <input type="radio" name="clockFormat" value="12" checked 
+                               onchange="updateClockFormat()"> 12 Hour
+                    </label>
+                    <label class="settings-label">
+                        <input type="radio" name="clockFormat" value="24" 
+                               onchange="updateClockFormat()"> 24 Hour
+                    </label>
+                    
+                    <div style="margin-top: 15px;">
+                        <label class="settings-label">
+                            <input type="checkbox" id="boldClock" onchange="updateClockStyle()"> Bold
+                        </label>
+                        <label class="settings-label">
+                            <input type="checkbox" id="italicClock" onchange="updateClockStyle()"> Italic
+                        </label>
+                        <input type="color" id="clockColor" onchange="updateClockStyle()" style="margin-top: 10px;">
+                    </div>
+                </div>
+                
+                <button class="reset-button" onclick="showResetAlert()">Reset Settings</button>            </div>
+        </div>
+    `;
+    
+    settingsWindow.style.left = `${window.innerWidth/2 - 300}px`;
+    settingsWindow.style.top = `${window.innerHeight/2 - 200}px`;
+    
+    settingsWindow.querySelector('.title-bar').addEventListener('mousedown', startDrag);
+    document.body.appendChild(settingsWindow);
+    return settingsWindow;
+}
+
+        function updateWallpaper(url) {
+            document.body.style.backgroundImage = `url('${url}')`;
+        }
+
+        function handleFileUpload(input) {
+            const file = input.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => updateWallpaper(e.target.result);
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function updateClockFormat() {
+            const format = document.querySelector('input[name="clockFormat"]:checked').value;
+            localStorage.setItem('clockFormat', format);
+            updateClock();
+        }
+
+        function updateClockStyle() {
+            const clock = document.getElementById('clock');
+            clock.style.fontWeight = document.getElementById('boldClock').checked ? 'bold' : 'normal';
+            clock.style.fontStyle = document.getElementById('italicClock').checked ? 'italic' : 'normal';
+            clock.style.color = document.getElementById('clockColor').value;
+        }
+
+        function showResetAlert() {
+            document.getElementById('customAlert').style.display = 'flex';
+        }
+
+        function confirmReset(confirmed) {
+            document.getElementById('customAlert').style.display = 'none';
+            if (confirmed) {
+                // reset to normal system settings from startup cause why not
+                document.body.style.backgroundImage = `url('h tps://pfst.cf2.poecdn.net/base/image/ad1e0434aa6bdc9fcba468cffc80ed994580ceada9ab9388b4e666d5edbaf6ec?w=1024&h=576&pmaid=289054046')`;
+                document.getElementById('wallpaperUrl').value = '';
+                document.getElementById('wallpaperFile').value = '';
+                document.querySelector('input[name="clockFormat"][value="12"]').click();
+                document.getElementById('boldClock').checked = false;
+                document.getElementById('italicClock').checked = false;
+                document.getElementById('clockColor').value = '#ffffff';
+                updateClockStyle();
+            }
+        }
+
+        function updateClock() {
+            const now = new Date();
+            const format = localStorage.getItem('clockFormat') || '12';
+            
+            let hours = now.getHours();
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            const seconds = now.getSeconds().toString().padStart(2, '0');
+            
+            if (format === '12') {
+                const ampm = hours >= 12 ? 'PM' : 'AM';
+                hours = hours % 12 || 12;
+                var timeString = `${hours}:${minutes}:${seconds} ${ampm}`;
+            } else {
+                var timeString = `${hours.toString().padStart(2, '0')}:${minutes}:${seconds}`;
+            }
+            
+            const date = now.toLocaleDateString();
+            document.getElementById('clock').textContent = `${date} ${timeString}`;
+        }
+
+        
+        setInterval(updateClock, 1000);
+        updateClock();
+        
+    </script>
+</body>
+</html>
